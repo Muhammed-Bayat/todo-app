@@ -1,65 +1,113 @@
-import Image from "next/image";
 import styles from "./page.module.css";
 
+import { createTaskAction } from "@/app/actions";
+import { getActiveTasks } from "@/lib/tasks";
+
+export const dynamic = "force-dynamic";
+
 export default function Home() {
+  const tasks = getActiveTasks();
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+        <header className={styles.header}>
+          <h1>Todo</h1>
+          <p>Create tasks and keep track of what needs to be done.</p>
+        </header>
+
+        <section className={styles.panel} aria-labelledby="create-task-heading">
+          <h2 id="create-task-heading">Create a task</h2>
+
+          <form action={createTaskAction} className={styles.form}>
+            <div className={styles.field}>
+              <label htmlFor="title">Title</label>
+              <input
+                id="title"
+                name="title"
+                type="text"
+                required
+                maxLength={200}
+              />
+            </div>
+
+            <div className={styles.field}>
+              <label htmlFor="description">Description</label>
+              <textarea
+                id="description"
+                name="description"
+                rows={4}
+              />
+            </div>
+
+            <div className={styles.field}>
+              <label htmlFor="dueDate">Due date</label>
+              <input
+                id="dueDate"
+                name="dueDate"
+                type="date"
+                required
+              />
+            </div>
+
+            <div className={styles.field}>
+              <label htmlFor="topic">Topic</label>
+              <input
+                id="topic"
+                name="topic"
+                type="text"
+                required
+                maxLength={100}
+              />
+            </div>
+
+            <button className={styles.button} type="submit">
+              Create task
+            </button>
+          </form>
+        </section>
+
+        <section className={styles.panel} aria-labelledby="active-tasks-heading">
+          <div className={styles.sectionHeading}>
+            <h2 id="active-tasks-heading">Active tasks</h2>
+            <span>
+              {tasks.length} {tasks.length === 1 ? "task" : "tasks"}
+            </span>
+          </div>
+
+          {tasks.length === 0 ? (
+            <p className={styles.emptyState}>
+              No active tasks yet. Create your first task above.
+            </p>
+          ) : (
+            <ul className={styles.taskList}>
+              {tasks.map((task) => (
+                <li className={styles.task} key={task.id}>
+                  <div className={styles.taskHeading}>
+                    <h3>{task.title}</h3>
+                    <span className={styles.status}>{task.status}</span>
+                  </div>
+
+                  <dl className={styles.taskDetails}>
+                    <div>
+                      <dt>Topic</dt>
+                      <dd>{task.topic}</dd>
+                    </div>
+
+                    <div>
+                      <dt>Due date</dt>
+                      <dd>{task.dueDate}</dd>
+                    </div>
+                  </dl>
+
+                  {task.description.length > 0 && (
+                    <p className={styles.description}>{task.description}</p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       </main>
     </div>
   );
