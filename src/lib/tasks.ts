@@ -1,7 +1,13 @@
 import "server-only";
 
 import { db } from "@/lib/database";
-import type { CreateTaskInput, Task, TaskStatus } from "@/types/task";
+import {
+  TASK_STATUSES,
+  type CreateTaskInput,
+  type Task,
+  type TaskStatus,
+  type UpdateTaskInput,
+} from "@/types/task";
 
 interface TaskRow {
   id: number;
@@ -14,6 +20,25 @@ interface TaskRow {
   created_at: string;
   updated_at: string;
 }
+
+interface NormalizedTaskFields {
+  title: string;
+  description: string;
+  dueDate: string;
+  topic: string;
+}
+
+const taskColumns = `
+  id,
+  title,
+  description,
+  due_date,
+  topic,
+  status,
+  archived_at,
+  created_at,
+  updated_at
+`;
 
 function mapTaskRow(row: TaskRow): Task {
   return {
@@ -42,31 +67,9 @@ function isValidDate(date: string): boolean {
   );
 }
 
-export function getActiveTasks(): Task[] {
-  const rows = db
-    .prepare(
-      `
-        SELECT
-          id,
-          title,
-          description,
-          due_date,
-          topic,
-          status,
-          archived_at,
-          created_at,
-          updated_at
-        FROM tasks
-        WHERE archived_at IS NULL
-        ORDER BY created_at DESC, id DESC
-      `,
-    )
-    .all() as TaskRow[];
-
-  return rows.map(mapTaskRow);
-}
-
-export function createTask(input: CreateTaskInput): Task {
+function normalizeTaskFields(
+  input: CreateTaskInput,
+): NormalizedTaskFields {
   const title = input.title.trim();
   const description = input.description ?? "";
   const dueDate = input.dueDate.trim();
@@ -81,8 +84,55 @@ export function createTask(input: CreateTaskInput): Task {
   }
 
   if (!isValidDate(dueDate)) {
-    throw new Error("Due date must be a valid date in YYYY-MM-DD format.");
+    throw new Error(
+      "Due date must be a valid date in YYYY-MM-DD format.",
+    );
   }
+
+  return {
+    title,
+    description,
+    dueDate,
+    topic,
+  };
+}
+
+export function getActiveTasks(): Task[] {
+  const rows = db
+    .prepare(
+      `
+        SELECT ${taskColumns}
+        FROM tasks
+        WHERE archived_at IS NULL
+        ORDER BY created_at DESC, id DESC
+      `,
+    )
+    .all() as TaskRow[];
+
+  return rows.map(mapTaskRow);
+}
+
+export function getActiveTaskById(id: number): Task | null {
+  if (!Number.isInteger(id) || id <= 0) {
+    return null;
+  }
+
+  const row = db
+    .prepare(
+      `
+        SELECT ${taskColumns}
+        FROM tasks
+        WHERE id = ?
+          AND archived_at IS NULL
+      `,
+    )
+    .get(id) as TaskRow | undefined;
+
+  return row ? mapTaskRow(row) : null;
+}
+
+export function createTask(input: CreateTaskInput): Task {
+  const fields = normalizeTaskFields(input);
 
   const row = db
     .prepare(
@@ -94,22 +144,61 @@ export function createTask(input: CreateTaskInput): Task {
           topic
         )
         VALUES (?, ?, ?, ?)
-        RETURNING
-          id,
-          title,
-          description,
-          due_date,
-          topic,
-          status,
-          archived_at,
-          created_at,
-          updated_at
+        RETURNING ${taskColumns}
       `,
     )
-    .get(title, description, dueDate, topic) as TaskRow | undefined;
+    .get(
+      fields.title,
+      fields.description,
+      fields.dueDate,
+      fields.topic,
+    ) as TaskRow | undefined;
 
   if (!row) {
     throw new Error("The task could not be created.");
+  }
+
+  return mapTaskRow(row);
+}
+
+export function updateTask(input: UpdateTaskInput): Task {
+  if (!Number.isInteger(input.id) || input.id <= 0) {
+    throw new Error("A valid task ID is required.");
+  }
+
+  if (!TASK_STATUSES.includes(input.status)) {
+    throw new Error("A valid task status is required.");
+  }
+
+  const fields = normalizeTaskFields(input);
+
+  const row = db
+    .prepare(
+      `
+        UPDATE tasks
+        SET
+          title = ?,
+          description = ?,
+          due_date = ?,
+          topic = ?,
+          status = ?,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+          AND archived_at IS NULL
+        RETURNING ${taskColumns}
+      `,
+    )
+    .get(
+      fields.title,
+      fields.description,
+      fields.dueDate,
+      fields.topic,
+      input.status,
+      input.id,
+    ) as TaskRow | undefined;
+
+  if (!row) {
+    throw new Error("The active task could not be found.");
   }
 
   return mapTaskRow(row);

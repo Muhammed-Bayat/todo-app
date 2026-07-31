@@ -187,3 +187,26 @@
     flex-direction: column;
   }
 }
+
+.taskActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.editLink {
+  color: #243b53;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.editLink:hover {
+  color: #486581;
+}
+
+.editLink:focus-visible {
+  border-radius: 3px;
+  outline: 3px solid #bcccdc;
+  outline-offset: 3px;
+}

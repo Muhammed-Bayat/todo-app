@@ -1,4 +1,5 @@
 import styles from "./page.module.css";
+import Link from "next/link";
 
 import { createTaskAction } from "@/app/actions";
 import { getActiveTasks } from "@/lib/tasks";
@@ -85,7 +86,17 @@ export default function Home() {
                 <li className={styles.task} key={task.id}>
                   <div className={styles.taskHeading}>
                     <h3>{task.title}</h3>
-                    <span className={styles.status}>{task.status}</span>
+
+                    <div className={styles.taskActions}>
+                      <span className={styles.status}>{task.status}</span>
+
+                      <Link
+                        className={styles.editLink}
+                        href={`/tasks/${task.id}/edit`}
+                      >
+                        Edit
+                      </Link>
+                    </div>
                   </div>
 
                   <dl className={styles.taskDetails}>

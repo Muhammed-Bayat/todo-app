@@ -1,4 +1,10 @@
-export type TaskStatus = "Todo" | "In-Progress" | "Complete";
+export const TASK_STATUSES = [
+  "Todo",
+  "In-Progress",
+  "Complete",
+] as const;
+
+export type TaskStatus = (typeof TASK_STATUSES)[number];
 
 export interface Task {
   id: number;
@@ -17,4 +23,9 @@ export interface CreateTaskInput {
   description: string;
   dueDate: string;
   topic: string;
+}
+
+export interface UpdateTaskInput extends CreateTaskInput {
+  id: number;
+  status: TaskStatus;
 }
