@@ -112,6 +112,21 @@ export function getActiveTasks(): Task[] {
   return rows.map(mapTaskRow);
 }
 
+export function getArchivedTasks(): Task[] {
+  const rows = db
+    .prepare(
+      `
+        SELECT ${taskColumns}
+        FROM tasks
+        WHERE archived_at IS NOT NULL
+        ORDER BY archived_at DESC, id DESC
+      `,
+    )
+    .all() as TaskRow[];
+
+  return rows.map(mapTaskRow);
+}
+
 export function getActiveTaskById(id: number): Task | null {
   if (!Number.isInteger(id) || id <= 0) {
     return null;
@@ -196,6 +211,32 @@ export function updateTask(input: UpdateTaskInput): Task {
       input.status,
       input.id,
     ) as TaskRow | undefined;
+
+  if (!row) {
+    throw new Error("The active task could not be found.");
+  }
+
+  return mapTaskRow(row);
+}
+
+export function archiveTask(id: number): Task {
+  if (!Number.isInteger(id) || id <= 0) {
+    throw new Error("A valid task ID is required.");
+  }
+
+  const row = db
+    .prepare(
+      `
+        UPDATE tasks
+        SET
+          archived_at = CURRENT_TIMESTAMP,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+          AND archived_at IS NULL
+        RETURNING ${taskColumns}
+      `,
+    )
+    .get(id) as TaskRow | undefined;
 
   if (!row) {
     throw new Error("The active task could not be found.");

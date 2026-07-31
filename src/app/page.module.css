@@ -25,6 +25,31 @@
   color: #52606d;
 }
 
+.headerTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.navLink {
+  flex-shrink: 0;
+  color: #243b53;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.navLink:hover {
+  color: #486581;
+}
+
+.navLink:focus-visible {
+  border-radius: 3px;
+  outline: 3px solid #bcccdc;
+  outline-offset: 3px;
+}
+
 .panel {
   margin-bottom: 24px;
   padding: 24px;
@@ -181,6 +206,7 @@
     padding: 18px;
   }
 
+  .headerTop
   .taskHeading,
   .sectionHeading {
     align-items: flex-start;
@@ -208,5 +234,31 @@
 .editLink:focus-visible {
   border-radius: 3px;
   outline: 3px solid #bcccdc;
+  outline-offset: 3px;
+}
+
+.archiveForm {
+  margin: 0;
+}
+
+.archiveButton {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #7c2d12;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.archiveButton:hover {
+  color: #9a3412;
+}
+
+.archiveButton:focus-visible {
+  border-radius: 3px;
+  outline: 3px solid #fed7aa;
   outline-offset: 3px;
 }

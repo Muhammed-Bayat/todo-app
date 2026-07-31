@@ -1,7 +1,11 @@
-import styles from "./page.module.css";
 import Link from "next/link";
 
-import { createTaskAction } from "@/app/actions";
+import styles from "./page.module.css";
+
+import {
+  archiveTaskAction,
+  createTaskAction,
+} from "@/app/actions";
 import { getActiveTasks } from "@/lib/tasks";
 
 export const dynamic = "force-dynamic";
@@ -13,11 +17,25 @@ export default function Home() {
     <div className={styles.page}>
       <main className={styles.main}>
         <header className={styles.header}>
-          <h1>Todo</h1>
-          <p>Create tasks and keep track of what needs to be done.</p>
+          <div className={styles.headerTop}>
+            <div>
+              <h1>Todo</h1>
+              <p>
+                Create tasks and keep track of what needs to be
+                done.
+              </p>
+            </div>
+
+            <Link className={styles.navLink} href="/archived">
+              Archived tasks
+            </Link>
+          </div>
         </header>
 
-        <section className={styles.panel} aria-labelledby="create-task-heading">
+        <section
+          className={styles.panel}
+          aria-labelledby="create-task-heading"
+        >
           <h2 id="create-task-heading">Create a task</h2>
 
           <form action={createTaskAction} className={styles.form}>
@@ -68,7 +86,10 @@ export default function Home() {
           </form>
         </section>
 
-        <section className={styles.panel} aria-labelledby="active-tasks-heading">
+        <section
+          className={styles.panel}
+          aria-labelledby="active-tasks-heading"
+        >
           <div className={styles.sectionHeading}>
             <h2 id="active-tasks-heading">Active tasks</h2>
             <span>
@@ -88,7 +109,9 @@ export default function Home() {
                     <h3>{task.title}</h3>
 
                     <div className={styles.taskActions}>
-                      <span className={styles.status}>{task.status}</span>
+                      <span className={styles.status}>
+                        {task.status}
+                      </span>
 
                       <Link
                         className={styles.editLink}
@@ -96,6 +119,24 @@ export default function Home() {
                       >
                         Edit
                       </Link>
+
+                      <form
+                        action={archiveTaskAction}
+                        className={styles.archiveForm}
+                      >
+                        <input
+                          name="taskId"
+                          type="hidden"
+                          value={task.id}
+                        />
+
+                        <button
+                          className={styles.archiveButton}
+                          type="submit"
+                        >
+                          Archive
+                        </button>
+                      </form>
                     </div>
                   </div>
 
@@ -112,7 +153,9 @@ export default function Home() {
                   </dl>
 
                   {task.description.length > 0 && (
-                    <p className={styles.description}>{task.description}</p>
+                    <p className={styles.description}>
+                      {task.description}
+                    </p>
                   )}
                 </li>
               ))}

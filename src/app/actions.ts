@@ -3,7 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { createTask, updateTask } from "@/lib/tasks";
+import {
+  archiveTask,
+  createTask,
+  updateTask,
+} from "@/lib/tasks";
 import {
   TASK_STATUSES,
   type TaskStatus,
@@ -58,4 +62,15 @@ export async function updateTaskAction(
   revalidatePath(`/tasks/${taskId}/edit`);
 
   redirect("/");
+}
+
+export async function archiveTaskAction(
+  formData: FormData,
+): Promise<void> {
+  const taskId = Number(getTextField(formData, "taskId"));
+
+  archiveTask(taskId);
+
+  revalidatePath("/");
+  revalidatePath("/archived");
 }
