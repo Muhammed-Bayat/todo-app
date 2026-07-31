@@ -5,6 +5,8 @@ import {
   TASK_STATUSES,
   type CreateTaskInput,
   type Task,
+  type TaskSortDirection,
+  type TaskSortOption,
   type TaskStatus,
   type UpdateTaskInput,
 } from "@/types/task";
@@ -39,6 +41,58 @@ const taskColumns = `
   created_at,
   updated_at
 `;
+
+const activeTaskOrderBy: Record<
+  TaskSortOption,
+  Record<TaskSortDirection, string>
+> = {
+  dueDate: {
+    asc: `
+      due_date ASC,
+      created_at DESC,
+      id DESC
+    `,
+    desc: `
+      due_date DESC,
+      created_at DESC,
+      id DESC
+    `,
+  },
+
+  topic: {
+    asc: `
+      topic COLLATE NOCASE ASC,
+      due_date ASC,
+      id DESC
+    `,
+    desc: `
+      topic COLLATE NOCASE DESC,
+      due_date ASC,
+      id DESC
+    `,
+  },
+
+  status: {
+    asc: `
+      CASE status
+        WHEN 'Todo' THEN 1
+        WHEN 'In-Progress' THEN 2
+        WHEN 'Complete' THEN 3
+      END ASC,
+      due_date ASC,
+      id DESC
+    `,
+    desc: `
+      CASE status
+        WHEN 'Todo' THEN 1
+        WHEN 'In-Progress' THEN 2
+        WHEN 'Complete' THEN 3
+      END DESC,
+      due_date ASC,
+      id DESC
+    `,
+  },
+};
 
 function mapTaskRow(row: TaskRow): Task {
   return {
@@ -97,14 +151,19 @@ function normalizeTaskFields(
   };
 }
 
-export function getActiveTasks(): Task[] {
+export function getActiveTasks(
+  sort: TaskSortOption = "dueDate",
+  direction: TaskSortDirection = "asc",
+): Task[] {
+  const orderBy = activeTaskOrderBy[sort][direction];
+
   const rows = db
     .prepare(
       `
         SELECT ${taskColumns}
         FROM tasks
         WHERE archived_at IS NULL
-        ORDER BY created_at DESC, id DESC
+        ORDER BY ${orderBy}
       `,
     )
     .all() as TaskRow[];

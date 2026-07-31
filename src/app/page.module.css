@@ -93,9 +93,9 @@
 
 .field input:focus,
 .field textarea:focus {
+  border-color: #486581;
   outline: 3px solid #bcccdc;
   outline-offset: 1px;
-  border-color: #486581;
 }
 
 .button {
@@ -121,13 +121,76 @@
 
 .sectionHeading {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
 
 .sectionHeading span {
   color: #52606d;
+}
+
+.headingGroup {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.headingGroup h2 {
+  margin-bottom: 0;
+}
+
+.sortControls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.sortControls label {
+  font-weight: 600;
+}
+
+.sortSelect {
+  padding: 8px 10px;
+  border: 1px solid #9fb3c8;
+  border-radius: 6px;
+  background: #ffffff;
+  color: inherit;
+  font: inherit;
+}
+
+.sortSelect:focus {
+  border-color: #486581;
+  outline: 3px solid #bcccdc;
+  outline-offset: 1px;
+}
+
+.directionButton {
+  min-width: 76px;
+  padding: 8px 12px;
+  border: 1px solid #486581;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #243b53;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.directionButton:hover:not(:disabled) {
+  background: #f0f4f8;
+}
+
+.directionButton:focus-visible {
+  outline: 3px solid #bcccdc;
+  outline-offset: 2px;
+}
+
+.sortSelect:disabled,
+.directionButton:disabled {
+  cursor: wait;
+  opacity: 0.65;
 }
 
 .emptyState {
@@ -149,6 +212,11 @@
   border-radius: 8px;
 }
 
+.overdueTask {
+  border-color: #c2410c;
+  box-shadow: inset 4px 0 0 #c2410c;
+}
+
 .taskHeading {
   display: flex;
   align-items: flex-start;
@@ -160,6 +228,13 @@
   margin: 0;
 }
 
+.taskActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
 .status {
   flex-shrink: 0;
   padding: 4px 8px;
@@ -169,55 +244,14 @@
   font-weight: 600;
 }
 
-.taskDetails {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px 32px;
-  margin: 16px 0 0;
-}
-
-.taskDetails div {
-  display: grid;
-  gap: 2px;
-}
-
-.taskDetails dt {
-  color: #52606d;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.taskDetails dd {
-  margin: 0;
-}
-
-.description {
-  margin: 16px 0 0;
-  white-space: pre-wrap;
-}
-
-@media (max-width: 600px) {
-  .page {
-    padding: 24px 12px;
-  }
-
-  .panel {
-    padding: 18px;
-  }
-
-  .headerTop
-  .taskHeading,
-  .sectionHeading {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-}
-
-.taskActions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.overdueBadge {
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #ffedd5;
+  color: #9a3412;
+  font-size: 0.875rem;
+  font-weight: 700;
 }
 
 .editLink {
@@ -261,4 +295,64 @@
   border-radius: 3px;
   outline: 3px solid #fed7aa;
   outline-offset: 3px;
+}
+
+.taskDetails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+  margin: 16px 0 0;
+}
+
+.taskDetails div {
+  display: grid;
+  gap: 2px;
+}
+
+.taskDetails dt {
+  color: #52606d;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.taskDetails dd {
+  margin: 0;
+}
+
+.overdueDate {
+  color: #9a3412;
+  font-weight: 700;
+}
+
+.description {
+  margin: 16px 0 0;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 24px 12px;
+  }
+
+  .panel {
+    padding: 18px;
+  }
+
+  .headerTop,
+  .taskHeading,
+  .sectionHeading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .headingGroup {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .sortControls {
+    align-items: flex-start;
+  }
 }

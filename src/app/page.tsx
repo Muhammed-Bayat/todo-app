@@ -6,12 +6,68 @@ import {
   archiveTaskAction,
   createTaskAction,
 } from "@/app/actions";
+import {
+  getLocalDateString,
+  isTaskOverdue,
+} from "@/lib/task-rules";
 import { getActiveTasks } from "@/lib/tasks";
+import { SortControls } from "@/app/sort-controls";
+import {
+  TASK_SORT_DIRECTIONS,
+  TASK_SORT_OPTIONS,
+  type TaskSortDirection,
+  type TaskSortOption,
+} from "@/types/task";
 
 export const dynamic = "force-dynamic";
 
-export default function Home() {
-  const tasks = getActiveTasks();
+interface HomePageProps {
+  searchParams: Promise<{
+    sort?: string | string[];
+    direction?: string | string[];
+  }>;
+}
+
+function getSortOption(
+  value: string | string[] | undefined,
+): TaskSortOption {
+  if (
+    typeof value === "string" &&
+    TASK_SORT_OPTIONS.includes(value as TaskSortOption)
+  ) {
+    return value as TaskSortOption;
+  }
+
+  return "dueDate";
+}
+
+function getSortDirection(
+  value: string | string[] | undefined,
+): TaskSortDirection {
+  if (
+    typeof value === "string" &&
+    TASK_SORT_DIRECTIONS.includes(
+      value as TaskSortDirection,
+    )
+  ) {
+    return value as TaskSortDirection;
+  }
+
+  return "asc";
+}
+
+export default async function Home({
+  searchParams,
+}: HomePageProps) {
+  const {
+    sort: requestedSort,
+    direction: requestedDirection,
+  } = await searchParams;
+
+  const sort = getSortOption(requestedSort);
+  const direction = getSortDirection(requestedDirection);
+  const tasks = getActiveTasks(sort, direction);
+  const today = getLocalDateString();
 
   return (
     <div className={styles.page}>
@@ -91,10 +147,18 @@ export default function Home() {
           aria-labelledby="active-tasks-heading"
         >
           <div className={styles.sectionHeading}>
-            <h2 id="active-tasks-heading">Active tasks</h2>
-            <span>
-              {tasks.length} {tasks.length === 1 ? "task" : "tasks"}
-            </span>
+            <div className={styles.headingGroup}>
+              <h2 id="active-tasks-heading">Active tasks</h2>
+              <span>
+                {tasks.length}{" "}
+                {tasks.length === 1 ? "task" : "tasks"}
+              </span>
+            </div>
+
+            <SortControls
+              sort={sort}
+              direction={direction}
+            />
           </div>
 
           {tasks.length === 0 ? (
@@ -103,62 +167,85 @@ export default function Home() {
             </p>
           ) : (
             <ul className={styles.taskList}>
-              {tasks.map((task) => (
-                <li className={styles.task} key={task.id}>
-                  <div className={styles.taskHeading}>
-                    <h3>{task.title}</h3>
+              {tasks.map((task) => {
+                const overdue = isTaskOverdue(task, today);
 
-                    <div className={styles.taskActions}>
-                      <span className={styles.status}>
-                        {task.status}
-                      </span>
+                return (
+                  <li
+                    className={`${styles.task} ${
+                      overdue ? styles.overdueTask : ""
+                    }`}
+                    key={task.id}
+                  >
+                    <div className={styles.taskHeading}>
+                      <h3>{task.title}</h3>
 
-                      <Link
-                        className={styles.editLink}
-                        href={`/tasks/${task.id}/edit`}
-                      >
-                        Edit
-                      </Link>
+                      <div className={styles.taskActions}>
+                        <span className={styles.status}>
+                          {task.status}
+                        </span>
 
-                      <form
-                        action={archiveTaskAction}
-                        className={styles.archiveForm}
-                      >
-                        <input
-                          name="taskId"
-                          type="hidden"
-                          value={task.id}
-                        />
+                        {overdue && (
+                          <span className={styles.overdueBadge}>
+                            Overdue
+                          </span>
+                        )}
 
-                        <button
-                          className={styles.archiveButton}
-                          type="submit"
+                        <Link
+                          className={styles.editLink}
+                          href={`/tasks/${task.id}/edit`}
                         >
-                          Archive
-                        </button>
-                      </form>
-                    </div>
-                  </div>
+                          Edit
+                        </Link>
 
-                  <dl className={styles.taskDetails}>
-                    <div>
-                      <dt>Topic</dt>
-                      <dd>{task.topic}</dd>
+                        <form
+                          action={archiveTaskAction}
+                          className={styles.archiveForm}
+                        >
+                          <input
+                            name="taskId"
+                            type="hidden"
+                            value={task.id}
+                          />
+
+                          <button
+                            className={styles.archiveButton}
+                            type="submit"
+                          >
+                            Archive
+                          </button>
+                        </form>
+                      </div>
                     </div>
 
-                    <div>
-                      <dt>Due date</dt>
-                      <dd>{task.dueDate}</dd>
-                    </div>
-                  </dl>
+                    <dl className={styles.taskDetails}>
+                      <div>
+                        <dt>Topic</dt>
+                        <dd>{task.topic}</dd>
+                      </div>
 
-                  {task.description.length > 0 && (
-                    <p className={styles.description}>
-                      {task.description}
-                    </p>
-                  )}
-                </li>
-              ))}
+                      <div>
+                        <dt>Due date</dt>
+                        <dd
+                          className={
+                            overdue
+                              ? styles.overdueDate
+                              : undefined
+                          }
+                        >
+                          {task.dueDate}
+                        </dd>
+                      </div>
+                    </dl>
+
+                    {task.description.length > 0 && (
+                      <p className={styles.description}>
+                        {task.description}
+                      </p>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           )}
         </section>
