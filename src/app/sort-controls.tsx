@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useState,
-  useTransition,
-} from "react";
+import { useTransition } from "react";
 import {
   usePathname,
   useRouter,
@@ -35,24 +31,12 @@ export function SortControls({
 }: SortControlsProps) {
   const pathname = usePathname();
   const router = useRouter();
-
-  const [selectedSort, setSelectedSort] = useState(sort);
-  const [selectedDirection, setSelectedDirection] =
-    useState(direction);
   const [isPending, startTransition] = useTransition();
-
-  useEffect(() => {
-    setSelectedSort(sort);
-    setSelectedDirection(direction);
-  }, [sort, direction]);
 
   function navigate(
     nextSort: TaskSortOption,
     nextDirection: TaskSortDirection,
   ) {
-    setSelectedSort(nextSort);
-    setSelectedDirection(nextDirection);
-
     const params = new URLSearchParams({
       sort: nextSort,
       direction: nextDirection,
@@ -70,19 +54,19 @@ export function SortControls({
   ) {
     navigate(
       event.target.value as TaskSortOption,
-      selectedDirection,
+      direction,
     );
   }
 
   function toggleDirection() {
     const nextDirection =
-      selectedDirection === "asc" ? "desc" : "asc";
+      direction === "asc" ? "desc" : "asc";
 
-    navigate(selectedSort, nextDirection);
+    navigate(sort, nextDirection);
   }
 
   const nextDirectionLabel =
-    selectedDirection === "asc"
+    direction === "asc"
       ? "descending"
       : "ascending";
 
@@ -96,7 +80,7 @@ export function SortControls({
       <select
         id="sort"
         className={styles.sortSelect}
-        value={selectedSort}
+        value={sort}
         onChange={handleSortChange}
         disabled={isPending}
       >
@@ -114,7 +98,7 @@ export function SortControls({
         disabled={isPending}
         aria-label={`Change to ${nextDirectionLabel} order`}
       >
-        {selectedDirection === "asc" ? "Asc ↑" : "Desc ↓"}
+        {direction === "asc" ? "Asc ↑" : "Desc ↓"}
       </button>
     </div>
   );
