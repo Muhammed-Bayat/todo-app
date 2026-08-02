@@ -1,8 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-
 import {
   archiveTask,
   createTask,
@@ -60,8 +58,6 @@ export async function updateTaskAction(
 
   revalidatePath("/");
   revalidatePath(`/tasks/${taskId}/edit`);
-
-  redirect("/");
 }
 
 export async function archiveTaskAction(
