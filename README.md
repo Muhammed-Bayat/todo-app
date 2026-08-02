@@ -8,7 +8,7 @@ The application runs locally on a single user's computer. It does not require us
 
 Before installing the application, ensure that the following are available:
 
-* Node.js 20.19 or newer
+* Node.js 24.14.1 or newer
 * npm
 * Git, when cloning the repository
 
