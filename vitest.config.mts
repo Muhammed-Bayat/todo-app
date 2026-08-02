@@ -8,10 +8,8 @@ export default defineConfig({
     },
   },
 
-test: {
-  environment: "node",
-  include: ["tests/**/*.test.ts"],
-  fileParallelism: false,
-  pool: "threads",
-},
+  test: {
+    environment: "node",
+    include: ["tests/**/*.test.ts"],
+  },
 });
