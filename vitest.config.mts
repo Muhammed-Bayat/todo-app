@@ -12,5 +12,6 @@ test: {
   environment: "node",
   include: ["tests/**/*.test.ts"],
   fileParallelism: false,
+  pool: "threads",
 },
 });
