@@ -185,6 +185,13 @@
   gap: 5px;
 }
 
+.listTools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
 .filters button {
   display: flex;
   align-items: center;
@@ -215,6 +222,38 @@
 .filters span {
   color: #89968f;
   font-size: 0.68rem;
+}
+
+.dateSortButton {
+  display: flex;
+  min-height: 38px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 9px;
+  padding: 0 11px 0 13px;
+  border: 1px solid #d4d7cc;
+  border-radius: 10px;
+  color: #617169;
+  background: rgba(255, 254, 248, 0.72);
+  font: inherit;
+  font-size: 0.74rem;
+  cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+}
+
+.dateSortButton:hover,
+.dateSortActive {
+  border-color: #a9c4b4;
+  color: #175d42;
+  background: #edf4ee;
+}
+
+.dateSortButton strong {
+  min-width: 46px;
+  color: #246a4e;
+  font-size: 0.69rem;
+  font-weight: 780;
+  text-align: right;
 }
 
 .taskList {
@@ -538,6 +577,7 @@
 .archiveToggle:focus-visible,
 .newTaskButton:focus-visible,
 .filters button:focus-visible,
+.dateSortButton:focus-visible,
 .cardActions button:focus-visible,
 .closeButton:focus-visible,
 .primaryButton:focus-visible,
@@ -556,6 +596,7 @@
   .hero { margin-bottom: 48px; }
   .hero h1 { font-size: clamp(2.8rem, 14vw, 4.2rem); }
   .listHeader { align-items: flex-start; flex-direction: column; }
+  .listTools { width: 100%; align-items: flex-start; flex-direction: column; }
   .taskList { grid-template-columns: 1fr; }
   .drawer { padding: 30px 22px; }
   .formRow { grid-template-columns: 1fr; }

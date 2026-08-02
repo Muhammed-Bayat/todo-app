@@ -19,6 +19,7 @@ import styles from "./page.module.css";
 
 type View = "active" | "archived";
 type StatusFilter = "All" | TaskStatus;
+type DateSortDirection = "asc" | "desc";
 type Drawer = { type: "create" } | { type: "edit"; task: Task } | null;
 
 const FILTERS: StatusFilter[] = ["All", ...TASK_STATUSES];
@@ -223,17 +224,72 @@ export function TaskWorkspace({
   const [view, setView] = useState<View>("active");
   const [filter, setFilter] = useState<StatusFilter>("All");
   const [drawer, setDrawer] = useState<Drawer>(null);
+  const [dateSorts, setDateSorts] = useState<
+    Record<
+      View,
+      Partial<Record<StatusFilter, DateSortDirection>>
+    >
+  >({
+    active: {},
+    archived: {},
+  });
 
   const sourceTasks = view === "active" ? activeTasks : archivedTasks;
-  const visibleTasks = useMemo(
-    () => filter === "All" ? sourceTasks : sourceTasks.filter((task) => task.status === filter),
-    [filter, sourceTasks],
-  );
+  const dateDirection = dateSorts[view][filter];
+  const visibleTasks = useMemo(() => {
+    const filteredTasks = filter === "All"
+      ? sourceTasks
+      : sourceTasks.filter((task) => task.status === filter);
+
+    return [...filteredTasks].sort((firstTask, secondTask) => {
+      if (dateDirection) {
+        const dueDateOrder = firstTask.dueDate.localeCompare(
+          secondTask.dueDate,
+        );
+
+        if (dueDateOrder !== 0) {
+          return dateDirection === "asc"
+            ? dueDateOrder
+            : -dueDateOrder;
+        }
+      }
+
+      if (view === "archived") {
+        const archiveOrder = (secondTask.archivedAt ?? "").localeCompare(
+          firstTask.archivedAt ?? "",
+        );
+
+        if (archiveOrder !== 0) {
+          return archiveOrder;
+        }
+      } else {
+        const createdOrder = secondTask.createdAt.localeCompare(
+          firstTask.createdAt,
+        );
+
+        if (createdOrder !== 0) {
+          return createdOrder;
+        }
+      }
+
+      return secondTask.id - firstTask.id;
+    });
+  }, [dateDirection, filter, sourceTasks, view]);
 
   function switchView(nextView: View) {
     setView(nextView);
     setFilter("All");
     setDrawer(null);
+  }
+
+  function toggleDateDirection() {
+    setDateSorts((currentSorts) => ({
+      ...currentSorts,
+      [view]: {
+        ...currentSorts[view],
+        [filter]: dateDirection === "asc" ? "desc" : "asc",
+      },
+    }));
   }
 
   return (
@@ -274,23 +330,47 @@ export function TaskWorkspace({
               <h2 id="task-list-heading">{view === "active" ? "Tasks" : "Archive"}</h2>
               <p>{sourceTasks.length} {sourceTasks.length === 1 ? "task" : "tasks"}</p>
             </div>
-            <div className={styles.filters} aria-label="Filter tasks by status">
-              {FILTERS.map((item) => {
-                const count = item === "All"
-                  ? sourceTasks.length
-                  : sourceTasks.filter((task) => task.status === item).length;
-                return (
-                  <button
-                    className={filter === item ? styles.filterActive : ""}
-                    key={item}
-                    onClick={() => setFilter(item)}
-                    type="button"
-                  >
-                    {item === "In-Progress" ? "In progress" : item}
-                    <span>{count}</span>
-                  </button>
-                );
-              })}
+            <div className={styles.listTools}>
+              <div className={styles.filters} aria-label="Filter tasks by status">
+                {FILTERS.map((item) => {
+                  const count = item === "All"
+                    ? sourceTasks.length
+                    : sourceTasks.filter((task) => task.status === item).length;
+                  return (
+                    <button
+                      className={filter === item ? styles.filterActive : ""}
+                      key={item}
+                      onClick={() => setFilter(item)}
+                      type="button"
+                    >
+                      {item === "In-Progress" ? "In progress" : item}
+                      <span>{count}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button
+                aria-label={
+                  dateDirection === "asc"
+                    ? "Sort due dates descending"
+                    : "Sort due dates ascending"
+                }
+                className={`${styles.dateSortButton} ${
+                  dateDirection ? styles.dateSortActive : ""
+                }`}
+                onClick={toggleDateDirection}
+                type="button"
+              >
+                <span>Due date</span>
+                <strong>
+                  {dateDirection === "asc"
+                    ? "Asc ↑"
+                    : dateDirection === "desc"
+                      ? "Desc ↓"
+                      : "Sort ↕"}
+                </strong>
+              </button>
             </div>
           </div>
 
