@@ -40,7 +40,7 @@ jobs:
         run: npm run lint
 
       - name: Run tests
-        run: npx vitest run --reporter=verbose
+        run: npm test
 
       - name: Create production build
         run: npm run build
