@@ -4,7 +4,9 @@
 
 This folder documents how AI tools were used throughout the complete development of the COMS3011A Todo App. The numbered files are organised by development phase rather than by chat session, because work moved between ChatGPT web chats and Codex repository sessions.
 
-The transcripts are deliberately transparent. They include:
+The five numbered files are verbatim prompt/response transcripts, not narrative handovers. They preserve the original spelling, grammar, timestamps, explanations, code, command output, incorrect suggestions, corrections, and failed approaches. The only added text is structural metadata such as transcript titles, exchange numbers, source labels, and labels distinguishing Codex commentary from its final answer.
+
+They include:
 
 - the user's requirements and questions;
 - recommendations made by the AI;
@@ -14,25 +16,45 @@ The transcripts are deliberately transparent. They include:
 - failed tests, failed CI attempts, and diagnostic dead ends;
 - commits, pushes, and verification results.
 
-They do not claim to reproduce hidden model reasoning. They record visible prompts, visible responses, repository evidence, and tool output.
+They do not claim to reproduce hidden model reasoning. Codex system/developer instructions, hidden reasoning, tool calls, and raw tool outputs are excluded. Only the user-visible prompts and assistant messages are treated as conversation transcript content.
 
 ## Numbered development record
 
 1. [Initial Next.js and Git setup](./01-initial-nextjs-and-git-setup.md)
 2. [Database design and SQLite connection](./02-database-design-and-connection.md)
 3. [Initial feature development](./03-initial-feature-development.md)
-4. [Single-page UI redesign](./04-ui-redesign.md)
-5. [Automated testing and CI repair](./05-testing-and-ci.md)
+4. [Single-page UI redesign and follow-up UI work](./04-ui-redesign.md)
+5. [Automated testing, CI repair, and documentation](./05-testing-and-ci.md)
 
 ## Raw source exports
 
-The following ChatGPT web exports are preserved without rewriting in the `raw files` folder so the original prompt/response sequences remain available:
+The following ChatGPT web exports supplied by the user are preserved without rewriting in the `raw files` folder:
 
 - [ChatGPT-Next.js TypeScript Setup.md](<raw files/ChatGPT-Next.js TypeScript Setup.md>)
 - [ChatGPT-COMS3011A Todo App Development.md](<raw files/ChatGPT-COMS3011A Todo App Development.md>)
 - [ChatGPT-Project Handover Steps.md](<raw files/ChatGPT-Project Handover Steps.md>)
 
-The numbered transcripts combine those exports with later Codex work. Where a transcript summarises a long code response, the corresponding raw export provides the original full response.
+The later Codex session was recovered from the local session log and converted into the same visible prompt/response format:
+
+- [Codex-Agent-Session.md](<raw files/Codex-Agent-Session.md>)
+
+That export contains the first 39 completed Codex turns for this repository. It stops before the request that generated the exact transcript rewrite, because that response was still in progress when the export was built.
+
+## Exact source coverage
+
+| Numbered transcript | Verbatim source exchanges |
+|---|---|
+| `01` | Next.js setup export, exchanges 1-21 |
+| `02` | Next.js setup export, exchanges 22-48 |
+| `03` | COMS3011A development export, exchanges 1-25 |
+| `04` | Codex session turns 1-12 and 18-37 |
+| `05` | Project handover/testing export, exchanges 1-11; Codex turns 13-17 and 38-39 |
+
+Together, the numbered files contain every exchange from all three user-supplied raw exports and every completed Codex turn through turn 39. Each exchange includes the complete prompt and complete visible response; long code responses are no longer summarized.
+
+## Reproducible split
+
+[`build-exact-transcripts.ps1`](./build-exact-transcripts.ps1) performs the mechanical split. It reads the three preserved ChatGPT exports and a Codex session JSONL path, checks the expected source exchange counts, writes the raw Codex export, and regenerates the five numbered files without paraphrasing message text.
 
 ## Commit timeline
 
@@ -54,3 +76,6 @@ The numbered transcripts combine those exports with later Codex work. Where a tr
 | `6eaeeb9` | Single-page task-workspace redesign |
 | `808823f` | Partial CI Node-version correction |
 | `86db49f` | Final passing Node 24 CI fix |
+| `9e75935` | Per-list due-date sorting and transcript collection |
+| `e2647c1` | Topic sorting and row-by-row card ordering |
+| `9cd1ffd` | Inline status synchronization and consistent green styling |
