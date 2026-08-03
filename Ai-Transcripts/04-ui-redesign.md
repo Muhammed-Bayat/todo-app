@@ -317,3 +317,23 @@ Codex first repeated this interpretation and waited for confirmation before edit
 - mobile CSS resets every card to column 1 with automatic rows.
 
 This guarantees row-by-row reading order for both due-date and topic sorting. Lint and all 8 automated tests passed after the correction.
+
+## Post-redesign correction: immediate status feedback
+
+The user reported that changing a task's status from its tile sometimes appeared to do nothing until the page was reloaded. The dropdown could also briefly appear white before its green status styling returned.
+
+The database mutation itself was working. The visual problem came from the inline dropdown using an uncontrolled `defaultValue` while its colour class continued to use the older task status received from the server. This allowed the browser's selected option, the React-rendered colour, and the latest SQLite value to temporarily disagree.
+
+Codex initially changed the inline control to use React's optimistic state pattern documented for the installed Next.js and React versions. Testing showed that this was still insufficient: when the Server Action completed before refreshed server props arrived, React discarded the temporary optimistic value and the select returned to the old status.
+
+The final implementation therefore uses persistent local state plus an explicit App Router refresh:
+
+- the selected status updates immediately in the browser;
+- the matching status colour updates from that same local value;
+- the existing Server Action then persists the change to SQLite and revalidates the page;
+- `router.refresh()` requests and merges fresh Server Component data after the save;
+- the status control is recreated with the confirmed value whenever a new server status arrives;
+- a failed save restores the last server-provided status;
+- the select has a pale emerald default background so it does not flash white while changing;
+- Todo, In-Progress, and Complete all keep an emerald treatment instead of Todo reverting to grey;
+- no database schema or repository changes were needed.

@@ -342,6 +342,8 @@
 }
 
 .statusSelect {
+  color: #27634a;
+  background: #e6f0e9;
   cursor: pointer;
 }
 
@@ -351,12 +353,7 @@
   padding-right: 10px;
 }
 
-.statusTodo {
-  border-color: #d6d6cc;
-  color: #646d67;
-  background: #f0f0e9;
-}
-
+.statusTodo,
 .statusInProgress {
   border-color: #c6d7cc;
   color: #27634a;

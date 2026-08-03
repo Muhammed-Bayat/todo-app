@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useFormStatus } from "react-dom";
+import { useRouter } from "next/navigation";
 
 import {
   archiveTaskAction,
@@ -141,19 +142,34 @@ function TaskForm({ task, onCancel }: { task?: Task; onCancel: () => void }) {
 
 function InlineStatus({ task }: { task: Task }) {
   const updateWithId = updateTaskAction.bind(null, task.id);
+  const router = useRouter();
+  const [status, setStatus] = useState(task.status);
+
+  async function saveStatus(formData: FormData) {
+    try {
+      await updateWithId(formData);
+      router.refresh();
+    } catch (error) {
+      setStatus(task.status);
+      throw error;
+    }
+  }
 
   return (
-    <form action={updateWithId} className={styles.statusForm}>
+    <form action={saveStatus} className={styles.statusForm}>
       <input name="title" type="hidden" value={task.title} />
       <input name="description" type="hidden" value={task.description} />
       <input name="dueDate" type="hidden" value={task.dueDate} />
       <input name="topic" type="hidden" value={task.topic} />
       <select
         aria-label={`Change status for ${task.title}`}
-        className={`${styles.statusSelect} ${styles[`status${task.status.replace("-", "")}`]}`}
+        className={`${styles.statusSelect} ${styles[`status${status.replace("-", "")}`]}`}
         name="status"
-        defaultValue={task.status}
-        onChange={(event) => event.currentTarget.form?.requestSubmit()}
+        value={status}
+        onChange={(event) => {
+          setStatus(event.currentTarget.value as TaskStatus);
+          event.currentTarget.form?.requestSubmit();
+        }}
       >
         {TASK_STATUSES.map((status) => (
           <option key={status} value={status}>{status}</option>
@@ -197,7 +213,7 @@ function TaskCard({
             {task.status}
           </span>
         ) : (
-          <InlineStatus task={task} />
+          <InlineStatus key={`${task.id}-${task.status}`} task={task} />
         )}
       </div>
 
