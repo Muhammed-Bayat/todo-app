@@ -4,47 +4,11 @@ A local-first task manager built with Next.js, TypeScript and SQLite. Create, or
 
 ## Requirements
 
-- Node.js `24.14.1`
-- npm `11.11.0`
+- Node.js 24 LTS
+- npm
 - Git
 
-Install the requirements for your operating system.
-
-### Windows PowerShell
-
-```powershell
-winget install --id Volta.Volta --exact
-winget install --id Git.Git --exact --source winget
-```
-
-Close and reopen PowerShell, then install the required Node.js version. npm is included with Node.js.
-
-```powershell
-volta install node@24.14.1
-```
-
-### macOS
-
-```bash
-xcode-select --install
-curl https://get.volta.sh | bash
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
-volta install node@24.14.1
-```
-
-Apple Command Line Tools supplies Git. npm is included with Node.js.
-
-### Debian or Ubuntu Linux
-
-```bash
-sudo apt update
-sudo apt install -y curl git
-curl https://get.volta.sh | bash
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
-volta install node@24.14.1
-```
+The project and its CI workflow are tested with Node.js `24.14.1` and npm `11.11.0`.
 
 Verify the installed requirements:
 

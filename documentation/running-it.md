@@ -5,10 +5,10 @@ These instructions start the application from a clean clone. No separate SQLite 
 ## Required software
 
 - Git, to clone the repository.
-- Node.js `24.14.1`.
-- npm `11.11.0` (included with the stated Node installation).
+- Node.js 24 LTS.
+- npm (included with Node.js).
 
-The repository's GitHub Actions workflow uses Node.js `24.14.1`, so using the same version locally keeps installation and native SQLite behavior consistent with CI.
+The project and its GitHub Actions workflow are tested with Node.js `24.14.1` and npm `11.11.0`. Using those exact versions locally keeps installation and native SQLite behavior consistent with CI.
 
 Confirm the installed versions:
 
