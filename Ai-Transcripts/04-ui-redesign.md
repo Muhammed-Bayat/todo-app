@@ -263,3 +263,57 @@ npm test       2 files and all 8 tests passed
 npm run build  compiled and type-checked successfully
 git diff --check passed
 ```
+
+## Post-redesign enhancement: topic sorting
+
+The user then extended the sorting requirement:
+
+> i need to beable to sort the list by topic as well
+
+Codex reused the same interaction pattern rather than introducing a different control. A Topic button now sits beside Due date.
+
+The per-list setting was refactored from a date direction into an object containing:
+
+```text
+field: dueDate or topic
+direction: asc or desc
+```
+
+This means:
+
+- only one field is active at a time;
+- selecting Topic for the first time sorts A to Z and shows `Asc ↑`;
+- selecting Topic again sorts Z to A and shows `Desc ↓`;
+- selecting Due date switches the active field back to due date at `Asc ↑`;
+- each All/Todo/In-Progress/Complete filter remembers its own field and direction;
+- active and archived views retain separate settings;
+- topic comparison is case-insensitive;
+- tasks with equal topics fall back to the existing newest-first order;
+- a newly created task remains at the top while no explicit sort is selected.
+
+No database, schema, repository, or Server Action change was required. The implementation remained client-side because all task topics were already provided by the Server Component.
+
+## Post-redesign correction: row-by-row card ordering
+
+After testing the two sort controls, the user clarified that the visual two-column order also mattered. For a sorted sequence `1, 2, 3, 4`, the required desktop layout was:
+
+```text
+1  2
+3  4
+```
+
+and not:
+
+```text
+1  3
+2  4
+```
+
+Codex first repeated this interpretation and waited for confirmation before editing. After the user confirmed it, each visible task received an explicit grid row and column calculated from its sorted-array position:
+
+- positions 0 and 1 use row 1;
+- positions 2 and 3 use row 2;
+- later positions continue the same pattern;
+- mobile CSS resets every card to column 1 with automatic rows.
+
+This guarantees row-by-row reading order for both due-date and topic sorting. Lint and all 8 automated tests passed after the correction.

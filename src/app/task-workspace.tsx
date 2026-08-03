@@ -19,7 +19,12 @@ import styles from "./page.module.css";
 
 type View = "active" | "archived";
 type StatusFilter = "All" | TaskStatus;
-type DateSortDirection = "asc" | "desc";
+type SortField = "dueDate" | "topic";
+type SortDirection = "asc" | "desc";
+interface SortSetting {
+  field: SortField;
+  direction: SortDirection;
+}
 type Drawer = { type: "create" } | { type: "edit"; task: Task } | null;
 
 const FILTERS: StatusFilter[] = ["All", ...TASK_STATUSES];
@@ -160,19 +165,28 @@ function InlineStatus({ task }: { task: Task }) {
 
 function TaskCard({
   task,
+  position,
   archived,
   today,
   onEdit,
 }: {
   task: Task;
+  position: number;
   archived: boolean;
   today: string;
   onEdit: (task: Task) => void;
 }) {
   const overdue = !archived && isTaskOverdue(task, today);
+  const gridPosition = {
+    "--task-column": (position % 2) + 1,
+    "--task-row": Math.floor(position / 2) + 1,
+  } as React.CSSProperties;
 
   return (
-    <li className={`${styles.taskCard} ${overdue ? styles.overdue : ""}`}>
+    <li
+      className={`${styles.taskCard} ${overdue ? styles.overdue : ""}`}
+      style={gridPosition}
+    >
       <div className={styles.cardTop}>
         <div className={styles.taskIdentity}>
           <span className={styles.topic}>{task.topic}</span>
@@ -224,10 +238,10 @@ export function TaskWorkspace({
   const [view, setView] = useState<View>("active");
   const [filter, setFilter] = useState<StatusFilter>("All");
   const [drawer, setDrawer] = useState<Drawer>(null);
-  const [dateSorts, setDateSorts] = useState<
+  const [sortSettings, setSortSettings] = useState<
     Record<
       View,
-      Partial<Record<StatusFilter, DateSortDirection>>
+      Partial<Record<StatusFilter, SortSetting>>
     >
   >({
     active: {},
@@ -235,22 +249,38 @@ export function TaskWorkspace({
   });
 
   const sourceTasks = view === "active" ? activeTasks : archivedTasks;
-  const dateDirection = dateSorts[view][filter];
+  const sortSetting = sortSettings[view][filter];
   const visibleTasks = useMemo(() => {
     const filteredTasks = filter === "All"
       ? sourceTasks
       : sourceTasks.filter((task) => task.status === filter);
 
     return [...filteredTasks].sort((firstTask, secondTask) => {
-      if (dateDirection) {
+      if (sortSetting?.field === "dueDate") {
         const dueDateOrder = firstTask.dueDate.localeCompare(
           secondTask.dueDate,
         );
 
         if (dueDateOrder !== 0) {
-          return dateDirection === "asc"
+          return sortSetting.direction === "asc"
             ? dueDateOrder
             : -dueDateOrder;
+        }
+      }
+
+      if (sortSetting?.field === "topic") {
+        const firstTopic = firstTask.topic.toLowerCase();
+        const secondTopic = secondTask.topic.toLowerCase();
+        const topicOrder = firstTopic < secondTopic
+          ? -1
+          : firstTopic > secondTopic
+            ? 1
+            : 0;
+
+        if (topicOrder !== 0) {
+          return sortSetting.direction === "asc"
+            ? topicOrder
+            : -topicOrder;
         }
       }
 
@@ -274,7 +304,7 @@ export function TaskWorkspace({
 
       return secondTask.id - firstTask.id;
     });
-  }, [dateDirection, filter, sourceTasks, view]);
+  }, [filter, sortSetting, sourceTasks, view]);
 
   function switchView(nextView: View) {
     setView(nextView);
@@ -282,14 +312,42 @@ export function TaskWorkspace({
     setDrawer(null);
   }
 
-  function toggleDateDirection() {
-    setDateSorts((currentSorts) => ({
-      ...currentSorts,
-      [view]: {
-        ...currentSorts[view],
-        [filter]: dateDirection === "asc" ? "desc" : "asc",
-      },
-    }));
+  function toggleSort(field: SortField) {
+    setSortSettings((currentSettings) => {
+      const currentSetting = currentSettings[view][filter];
+      const direction = currentSetting?.field === field &&
+        currentSetting.direction === "asc"
+        ? "desc"
+        : "asc";
+
+      return {
+        ...currentSettings,
+        [view]: {
+          ...currentSettings[view],
+          [filter]: {
+            field,
+            direction,
+          },
+        },
+      };
+    });
+  }
+
+  function getSortLabel(field: SortField) {
+    if (sortSetting?.field !== field) {
+      return "Sort ↕";
+    }
+
+    return sortSetting.direction === "asc"
+      ? "Asc ↑"
+      : "Desc ↓";
+  }
+
+  function getNextSortDirection(field: SortField) {
+    return sortSetting?.field === field &&
+      sortSetting.direction === "asc"
+      ? "descending"
+      : "ascending";
   }
 
   return (
@@ -350,37 +408,42 @@ export function TaskWorkspace({
                 })}
               </div>
 
-              <button
-                aria-label={
-                  dateDirection === "asc"
-                    ? "Sort due dates descending"
-                    : "Sort due dates ascending"
-                }
-                className={`${styles.dateSortButton} ${
-                  dateDirection ? styles.dateSortActive : ""
-                }`}
-                onClick={toggleDateDirection}
-                type="button"
-              >
-                <span>Due date</span>
-                <strong>
-                  {dateDirection === "asc"
-                    ? "Asc ↑"
-                    : dateDirection === "desc"
-                      ? "Desc ↓"
-                      : "Sort ↕"}
-                </strong>
-              </button>
+              <div className={styles.sortButtons} aria-label="Sort tasks">
+                <button
+                  aria-label={`Sort due dates ${getNextSortDirection("dueDate")}`}
+                  className={`${styles.sortButton} ${
+                    sortSetting?.field === "dueDate" ? styles.sortActive : ""
+                  }`}
+                  onClick={() => toggleSort("dueDate")}
+                  type="button"
+                >
+                  <span>Due date</span>
+                  <strong>{getSortLabel("dueDate")}</strong>
+                </button>
+
+                <button
+                  aria-label={`Sort topics ${getNextSortDirection("topic")}`}
+                  className={`${styles.sortButton} ${
+                    sortSetting?.field === "topic" ? styles.sortActive : ""
+                  }`}
+                  onClick={() => toggleSort("topic")}
+                  type="button"
+                >
+                  <span>Topic</span>
+                  <strong>{getSortLabel("topic")}</strong>
+                </button>
+              </div>
             </div>
           </div>
 
           {visibleTasks.length ? (
             <ul className={styles.taskList}>
-              {visibleTasks.map((task) => (
+              {visibleTasks.map((task, position) => (
                 <TaskCard
                   archived={view === "archived"}
                   key={task.id}
                   onEdit={(selectedTask) => setDrawer({ type: "edit", task: selectedTask })}
+                  position={position}
                   task={task}
                   today={today}
                 />
