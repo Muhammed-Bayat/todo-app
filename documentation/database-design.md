@@ -65,3 +65,5 @@ No external database server or manual migration command is required. On first us
 4. executes `database/schema.sql` with `CREATE TABLE IF NOT EXISTS`.
 
 Automated tests use separate temporary SQLite files and remove them after each test, so tests do not modify the development database.
+
+AI Declaration: The preceding document was generated, reviewed and edited with the assistance of ChatGPT-Web[GPT-5.6 Sol (high)] and Codex[GPT-5.6 Sol (high)].

@@ -17,7 +17,7 @@ node --version
 npm --version
 ```
 
-The expected output begins with `v24.14.1` for Node and `11.11.0` for npm.
+To reproduce the verified environment exactly, the output begins with `v24.14.1` for Node and `11.11.0` for npm. Other Node.js 24 LTS patch releases satisfy the general runtime requirement.
 
 ## Install from a clean clone
 
@@ -37,7 +37,7 @@ npm ci
 npm run dev
 ```
 
-Open `http://localhost:3000` in a browser. The first request automatically creates `database/todo.db` and its `tasks` table from `database/schema.sql`. Stop the server with `Ctrl+C`.
+The default browser opens `http://localhost:3000` automatically when the server is ready. The first request automatically creates `database/todo.db` and its `tasks` table from `database/schema.sql`. Stop the server with `Ctrl+C`.
 
 ## Run the automated tests
 
@@ -62,7 +62,7 @@ npm run build
 npm start
 ```
 
-Open `http://localhost:3000`. The build step may require internet access when Next.js obtains the configured Geist font assets.
+The default browser opens `http://localhost:3000` automatically when the server is ready. The build step may require internet access when Next.js obtains the configured Geist font assets.
 
 ## Complete verification sequence
 
@@ -119,3 +119,5 @@ npm start
 ```
 
 The production server served `/` with HTTP status `200`. The disposable clone and its generated database were removed after verification.
+
+AI Declaration: The preceding document was generated, reviewed and edited with the assistance of ChatGPT-Web[GPT-5.6 Sol (high)] and Codex[GPT-5.6 Sol (high)].

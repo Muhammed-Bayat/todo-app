@@ -149,6 +149,11 @@ function New-Transcript(
   return $builder
 }
 
+function Add-AiDeclaration([Text.StringBuilder]$Builder) {
+  [void]$Builder.AppendLine("AI Declaration: The preceding document was generated and organised with the assistance of ChatGPT-Web[GPT-5.6 Sol (high)] and Codex[GPT-5.6 Sol (high)].")
+  [void]$Builder.AppendLine()
+}
+
 function Write-CodexRawExport(
   [object[]]$Turns,
   [int]$CompletedTurnCount
@@ -158,7 +163,7 @@ function Write-CodexRawExport(
   [void]$builder.AppendLine()
   [void]$builder.AppendLine("This file is a verbatim export of user-visible messages recovered from the local Codex session log for this repository. Hidden reasoning, system/developer instructions, tool calls, and tool outputs are excluded. Commentary and final-answer labels describe the original visible message phase; they are not part of the message text.")
   [void]$builder.AppendLine()
-  [void]$builder.AppendLine("The export stops after completed turn $CompletedTurnCount. The request that generated this export is not included because its response was still in progress when the files were generated.")
+  [void]$builder.AppendLine("The export stops after recorded turn $CompletedTurnCount. The request that generated this export is not included because its response was still in progress when the files were generated.")
   [void]$builder.AppendLine()
 
   for ($index = 0; $index -lt $CompletedTurnCount; $index++) {
@@ -199,7 +204,7 @@ $nextExchanges = Get-WebExchanges (Join-Path $rawDirectory $nextSourceName)
 $developmentExchanges = Get-WebExchanges (Join-Path $rawDirectory $developmentSourceName)
 $testingExchanges = Get-WebExchanges (Join-Path $rawDirectory $testingSourceName)
 $codexTurns = Get-CodexTurns $CodexSessionPath
-$completedCodexTurnCount = 39
+$completedCodexTurnCount = 70
 
 if ($nextExchanges.Count -ne 48) {
   throw "Expected 48 exchanges in $nextSourceName; found $($nextExchanges.Count)."
@@ -227,6 +232,7 @@ foreach ($exchange in $nextExchanges[0..20]) {
   $displayNumber++
   Add-WebExchange $transcript01 $nextSourceName $exchange $displayNumber
 }
+Add-AiDeclaration $transcript01
 Write-Utf8File `
   (Join-Path $transcriptDirectory "01-initial-nextjs-and-git-setup.md") `
   $transcript01.ToString()
@@ -239,6 +245,7 @@ foreach ($exchange in $nextExchanges[21..47]) {
   $displayNumber++
   Add-WebExchange $transcript02 $nextSourceName $exchange $displayNumber
 }
+Add-AiDeclaration $transcript02
 Write-Utf8File `
   (Join-Path $transcriptDirectory "02-database-design-and-connection.md") `
   $transcript02.ToString()
@@ -251,6 +258,7 @@ foreach ($exchange in $developmentExchanges) {
   $displayNumber++
   Add-WebExchange $transcript03 $developmentSourceName $exchange $displayNumber
 }
+Add-AiDeclaration $transcript03
 Write-Utf8File `
   (Join-Path $transcriptDirectory "03-initial-feature-development.md") `
   $transcript03.ToString()
@@ -264,23 +272,25 @@ foreach ($index in $uiTurnIndexes) {
   $displayNumber++
   Add-CodexTurn $transcript04 $codexTurns[$index] $displayNumber
 }
+Add-AiDeclaration $transcript04
 Write-Utf8File `
   (Join-Path $transcriptDirectory "04-ui-redesign.md") `
   $transcript04.ToString()
 
 $transcript05 = New-Transcript `
-  "AI Usage Transcript 05: Automated Testing, CI Repair, and Documentation" `
-  "Source coverage: all exchanges in ``raw files/$testingSourceName`` (original exchanges 1-11), followed by completed Codex turns 13-17 and 38-39 from ``raw files/Codex-Agent-Session.md``."
+  "AI Usage Transcript 05: Testing, CI, Documentation, and Setup Troubleshooting" `
+  "Source coverage: all exchanges in ``raw files/$testingSourceName`` (original exchanges 1-11), followed by Codex turns 13-17 and 38-70 from ``raw files/Codex-Agent-Session.md``."
 $displayNumber = 0
 foreach ($exchange in $testingExchanges) {
   $displayNumber++
   Add-WebExchange $transcript05 $testingSourceName $exchange $displayNumber
 }
-$testingTurnIndexes = @(12..16) + @(37..38)
+$testingTurnIndexes = @(12..16) + @(37..69)
 foreach ($index in $testingTurnIndexes) {
   $displayNumber++
   Add-CodexTurn $transcript05 $codexTurns[$index] $displayNumber
 }
+Add-AiDeclaration $transcript05
 Write-Utf8File `
   (Join-Path $transcriptDirectory "05-testing-and-ci.md") `
   $transcript05.ToString()
@@ -333,7 +343,7 @@ Assert-ExchangeCount $content01 21 "transcript 01"
 Assert-ExchangeCount $content02 27 "transcript 02"
 Assert-ExchangeCount $content03 25 "transcript 03"
 Assert-ExchangeCount $content04 32 "transcript 04"
-Assert-ExchangeCount $content05 18 "transcript 05"
+Assert-ExchangeCount $content05 49 "transcript 05"
 
 foreach ($exchange in $nextExchanges[0..20]) {
   Assert-ContainsExactText $content01 $exchange.Prompt "transcript 01 prompt $($exchange.Number)"

@@ -1181,3 +1181,5 @@ This lists the files and folders at the top level, including hidden items such a
 
 Paste the output here, and we’ll go through what each item is for before moving deeper into `src`.
 
+AI Declaration: The preceding document was generated and organised with the assistance of ChatGPT-Web[GPT-5.6 Sol (high)] and Codex[GPT-5.6 Sol (high)].
+
