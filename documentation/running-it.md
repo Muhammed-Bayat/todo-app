@@ -24,7 +24,7 @@ The expected output begins with `v24.14.1` for Node and `11.11.0` for npm.
 Run these commands in a terminal:
 
 ```bash
-git clone https://github.com/Muhammed-Bayat/todo-app.git
+git clone --branch main --single-branch https://github.com/Muhammed-Bayat/todo-app.git
 cd todo-app
 npm ci
 ```
@@ -75,3 +75,47 @@ npm run build
 ```
 
 All commands should exit successfully before the application is considered verified.
+
+## Clean-clone verification record
+
+These instructions were verified from a separate clean clone rather than from the existing development working directory.
+
+| Item | Verified value |
+|---|---|
+| Date | 3 August 2026 |
+| Commit tested | `f3334bc9c5547a68957d247703d8806821a9b49e` |
+| Operating system and shell | Windows with PowerShell |
+| Node.js | `v24.14.1` |
+| npm | `11.11.0` |
+
+The following documented commands were run in order:
+
+```bash
+git clone --branch main --single-branch https://github.com/Muhammed-Bayat/todo-app.git
+cd todo-app
+node --version
+npm --version
+npm ci
+npm run lint
+npm test
+npm run build
+npm run dev
+```
+
+The clean-clone results were:
+
+- `npm ci` installed the locked dependency tree successfully;
+- ESLint completed with no errors;
+- Vitest passed both test files and all 8 tests;
+- the Next.js production build compiled, type-checked and generated all routes successfully;
+- `npm run dev` served `/` with HTTP status `200`;
+- the first request created `database/todo.db` automatically;
+- `/api/database-check` reported `database: "connected"` and `tasksTableExists: true`.
+
+After stopping the development server, the production command was also verified:
+
+```bash
+npm start
+```
+
+The production server served `/` with HTTP status `200`. The disposable clone and its generated database were removed after verification.
