@@ -1,6 +1,8 @@
 param(
   [Parameter(Mandatory = $true)]
-  [string]$CodexSessionPath
+  [string]$CodexSessionPath,
+
+  [string[]]$AdditionalCodexSessionPath = @()
 )
 
 $ErrorActionPreference = "Stop"
@@ -42,6 +44,10 @@ function Get-WebExchanges([string]$Path) {
 function Get-CodexTurns([string]$Path) {
   $turns = @()
   $currentTurn = $null
+  $usesLegacyEvents = Select-String `
+    -LiteralPath $Path `
+    -SimpleMatch '"type":"user_message"' `
+    -Quiet
 
   foreach ($line in Get-Content -LiteralPath $Path -Encoding UTF8) {
     try {
@@ -74,6 +80,54 @@ function Get-CodexTurns([string]$Path) {
       [void]$currentTurn.Messages.Add([PSCustomObject]@{
         Phase = [string]$item.payload.phase
         Text = [string]$item.payload.message
+      })
+      continue
+    }
+
+    if (
+      -not $usesLegacyEvents -and
+      $item.type -eq "response_item" -and
+      $item.payload.type -eq "message" -and
+      $item.payload.role -eq "user"
+    ) {
+      $prompt = [string](
+        $item.payload.content |
+          Where-Object { $_.type -eq "input_text" } |
+          Select-Object -First 1 -ExpandProperty text
+      )
+
+      if ($prompt.StartsWith("<environment_context>")) {
+        continue
+      }
+
+      if ($null -ne $currentTurn) {
+        $turns += $currentTurn
+      }
+
+      $currentTurn = [PSCustomObject]@{
+        Number = $turns.Count + 1
+        Prompt = $prompt
+        Messages = New-Object System.Collections.ArrayList
+      }
+      continue
+    }
+
+    if (
+      $null -ne $currentTurn -and
+      -not $usesLegacyEvents -and
+      $item.type -eq "response_item" -and
+      $item.payload.type -eq "message" -and
+      $item.payload.role -eq "assistant"
+    ) {
+      $messageText = [string](
+        $item.payload.content |
+          Where-Object { $_.type -eq "output_text" } |
+          Select-Object -First 1 -ExpandProperty text
+      )
+
+      [void]$currentTurn.Messages.Add([PSCustomObject]@{
+        Phase = [string]$item.payload.phase
+        Text = $messageText
       })
     }
   }
@@ -203,8 +257,17 @@ $testingSourceName = "ChatGPT-Project Handover Steps.md"
 $nextExchanges = Get-WebExchanges (Join-Path $rawDirectory $nextSourceName)
 $developmentExchanges = Get-WebExchanges (Join-Path $rawDirectory $developmentSourceName)
 $testingExchanges = Get-WebExchanges (Join-Path $rawDirectory $testingSourceName)
-$codexTurns = Get-CodexTurns $CodexSessionPath
-$completedCodexTurnCount = 70
+$codexTurns = @(Get-CodexTurns $CodexSessionPath)
+
+foreach ($additionalPath in $AdditionalCodexSessionPath) {
+  $codexTurns += @(Get-CodexTurns $additionalPath)
+}
+
+for ($index = 0; $index -lt $codexTurns.Count; $index++) {
+  $codexTurns[$index].Number = $index + 1
+}
+
+$completedCodexTurnCount = 75
 
 if ($nextExchanges.Count -ne 48) {
   throw "Expected 48 exchanges in $nextSourceName; found $($nextExchanges.Count)."
@@ -279,13 +342,13 @@ Write-Utf8File `
 
 $transcript05 = New-Transcript `
   "AI Usage Transcript 05: Testing, CI, Documentation, and Setup Troubleshooting" `
-  "Source coverage: all exchanges in ``raw files/$testingSourceName`` (original exchanges 1-11), followed by Codex turns 13-17 and 38-70 from ``raw files/Codex-Agent-Session.md``."
+  "Source coverage: all exchanges in ``raw files/$testingSourceName`` (original exchanges 1-11), followed by Codex turns 13-17 and 38-75 from ``raw files/Codex-Agent-Session.md``."
 $displayNumber = 0
 foreach ($exchange in $testingExchanges) {
   $displayNumber++
   Add-WebExchange $transcript05 $testingSourceName $exchange $displayNumber
 }
-$testingTurnIndexes = @(12..16) + @(37..69)
+$testingTurnIndexes = @(12..16) + @(37..74)
 foreach ($index in $testingTurnIndexes) {
   $displayNumber++
   Add-CodexTurn $transcript05 $codexTurns[$index] $displayNumber
@@ -343,7 +406,7 @@ Assert-ExchangeCount $content01 21 "transcript 01"
 Assert-ExchangeCount $content02 27 "transcript 02"
 Assert-ExchangeCount $content03 25 "transcript 03"
 Assert-ExchangeCount $content04 32 "transcript 04"
-Assert-ExchangeCount $content05 49 "transcript 05"
+Assert-ExchangeCount $content05 54 "transcript 05"
 
 foreach ($exchange in $nextExchanges[0..20]) {
   Assert-ContainsExactText $content01 $exchange.Prompt "transcript 01 prompt $($exchange.Number)"

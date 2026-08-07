@@ -40,7 +40,7 @@ The later Codex session was recovered from the local session log and converted i
 
 - [Codex-Agent-Session.md](<raw files/Codex-Agent-Session.md>)
 
-That export contains the first 70 recorded Codex turns for this repository, including the interrupted PDF-reading attempt. It stops before the request to commit and push the completed work, because that response was still in progress when the export was built.
+That export contains the first 75 completed or interrupted Codex turns for this repository, including the lab audit and the implementation of status sorting. It stops before the request that generated the latest transcript update, because that response was still in progress when the export was built.
 
 ## Exact source coverage
 
@@ -50,9 +50,9 @@ That export contains the first 70 recorded Codex turns for this repository, incl
 | `02` | Next.js setup export, exchanges 22-48 |
 | `03` | COMS3011A development export, exchanges 1-25 |
 | `04` | Codex session turns 1-12 and 18-37 |
-| `05` | Project handover/testing export, exchanges 1-11; Codex turns 13-17 and 38-70 |
+| `05` | Project handover/testing export, exchanges 1-11; Codex turns 13-17 and 38-75 |
 
-Together, the numbered files contain every exchange from all three user-supplied raw exports and every recorded Codex turn through turn 70. Each exchange includes the complete prompt and complete visible response; long code responses are no longer summarized.
+Together, the numbered files contain every exchange from all three user-supplied raw exports and every completed or interrupted Codex turn through turn 75. Each exchange includes the complete prompt and complete visible response; long code responses are no longer summarized.
 
 ## Reproducible split
 
@@ -85,5 +85,6 @@ Together, the numbered files contain every exchange from all three user-supplied
 | `b492050` | Simplified README and recorded clean-clone verification |
 | `caf76c7` | Cross-platform setup and run instructions |
 | `df03dcc` | Simplified software requirements |
+| `e056063` | Reliable clean installation, automatic browser launch, and AI-policy attribution |
 
 AI Declaration: The preceding document was generated, reviewed and edited with the assistance of ChatGPT-Web[GPT-5.6 Sol (high)] and Codex[GPT-5.6 Sol (high)].

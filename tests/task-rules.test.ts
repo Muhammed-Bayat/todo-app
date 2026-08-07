@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { isTaskOverdue } from "@/lib/task-rules";
+import {
+  compareTaskStatuses,
+  isTaskOverdue,
+} from "@/lib/task-rules";
 import type { TaskStatus } from "@/types/task";
 
 interface OverdueTestCase {
@@ -60,4 +63,38 @@ describe("isTaskOverdue", () => {
       ).toBe(expected);
     },
   );
+});
+
+describe("compareTaskStatuses", () => {
+  it("sorts the fixed statuses in workflow order", () => {
+    const statuses: TaskStatus[] = [
+      "Complete",
+      "Todo",
+      "In-Progress",
+    ];
+
+    expect(statuses.toSorted(compareTaskStatuses)).toEqual([
+      "Todo",
+      "In-Progress",
+      "Complete",
+    ]);
+  });
+
+  it("supports reverse status ordering", () => {
+    const statuses: TaskStatus[] = [
+      "Todo",
+      "Complete",
+      "In-Progress",
+    ];
+
+    expect(
+      statuses.toSorted((firstStatus, secondStatus) =>
+        compareTaskStatuses(secondStatus, firstStatus),
+      ),
+    ).toEqual([
+      "Complete",
+      "In-Progress",
+      "Todo",
+    ]);
+  });
 });

@@ -1,5 +1,11 @@
 import type { TaskStatus } from "@/types/task";
 
+const taskStatusOrder: Record<TaskStatus, number> = {
+  Todo: 1,
+  "In-Progress": 2,
+  Complete: 3,
+};
+
 interface OverdueCandidate {
   dueDate: string;
   status: TaskStatus;
@@ -20,4 +26,11 @@ export function isTaskOverdue(
   today: string = getLocalDateString(),
 ): boolean {
   return task.status !== "Complete" && task.dueDate < today;
+}
+
+export function compareTaskStatuses(
+  firstStatus: TaskStatus,
+  secondStatus: TaskStatus,
+): number {
+  return taskStatusOrder[firstStatus] - taskStatusOrder[secondStatus];
 }

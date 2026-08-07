@@ -83,7 +83,7 @@ These instructions were verified from a separate clean clone rather than from th
 | Item | Verified value |
 |---|---|
 | Date | 3 August 2026 |
-| Commit tested | `f3334bc9c5547a68957d247703d8806821a9b49e` |
+| Commit tested | `e056063d8c2a8905bc1826865ff89949fad52660` |
 | Operating system and shell | Windows with PowerShell |
 | Node.js | `v24.14.1` |
 | npm | `11.11.0` |
@@ -106,7 +106,7 @@ The clean-clone results were:
 
 - `npm ci` installed the locked dependency tree successfully;
 - ESLint completed with no errors;
-- Vitest passed both test files and all 8 tests;
+- Vitest passed both test files and all tests;
 - the Next.js production build compiled, type-checked and generated all routes successfully;
 - `npm run dev` served `/` with HTTP status `200`;
 - the first request created `database/todo.db` automatically;

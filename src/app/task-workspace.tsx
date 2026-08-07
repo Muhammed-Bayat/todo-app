@@ -9,7 +9,10 @@ import {
   createTaskAction,
   updateTaskAction,
 } from "@/app/actions";
-import { isTaskOverdue } from "@/lib/task-rules";
+import {
+  compareTaskStatuses,
+  isTaskOverdue,
+} from "@/lib/task-rules";
 import {
   TASK_STATUSES,
   type Task,
@@ -20,7 +23,7 @@ import styles from "./page.module.css";
 
 type View = "active" | "archived";
 type StatusFilter = "All" | TaskStatus;
-type SortField = "dueDate" | "topic";
+type SortField = "dueDate" | "topic" | "status";
 type SortDirection = "asc" | "desc";
 interface SortSetting {
   field: SortField;
@@ -300,6 +303,19 @@ export function TaskWorkspace({
         }
       }
 
+      if (sortSetting?.field === "status") {
+        const statusOrder = compareTaskStatuses(
+          firstTask.status,
+          secondTask.status,
+        );
+
+        if (statusOrder !== 0) {
+          return sortSetting.direction === "asc"
+            ? statusOrder
+            : -statusOrder;
+        }
+      }
+
       if (view === "archived") {
         const archiveOrder = (secondTask.archivedAt ?? "").localeCompare(
           firstTask.archivedAt ?? "",
@@ -447,6 +463,18 @@ export function TaskWorkspace({
                 >
                   <span>Topic</span>
                   <strong>{getSortLabel("topic")}</strong>
+                </button>
+
+                <button
+                  aria-label={`Sort statuses ${getNextSortDirection("status")}`}
+                  className={`${styles.sortButton} ${
+                    sortSetting?.field === "status" ? styles.sortActive : ""
+                  }`}
+                  onClick={() => toggleSort("status")}
+                  type="button"
+                >
+                  <span>Status</span>
+                  <strong>{getSortLabel("status")}</strong>
                 </button>
               </div>
             </div>

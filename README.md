@@ -61,7 +61,7 @@ Project planning, documentation, debugging and testing discussions also used Cha
 
 ### Historical commit-attribution omission
 
-AI-assisted commits from the existing project history, including code-bearing commits between `d936c33` and `f3334bc`, were created without the AI policy's required `Assisted-by:` trailer. This omission is recorded here transparently. Those past commits have not been amended or rebased because rewriting them would change the published commit hashes and invalidate references in the development transcripts. Future commits containing AI-generated code will name the tools and models that assisted that specific commit. For the current uncommitted SQLite and browser-launch changes, the trailer will be:
+AI-assisted commits from the existing project history, including code-bearing commits between `d936c33` and `f3334bc`, were created without the AI policy's required `Assisted-by:` trailer. This omission is recorded here transparently. Those past commits have not been amended or rebased because rewriting them would change the published commit hashes and invalidate references in the development transcripts. Later AI-assisted code commits include the required trailer, and future commits containing AI-generated code will continue to name the tools and models that assisted that specific commit.
 
 ```text
 Assisted-by: Codex[GPT-5.6 Sol (high)]

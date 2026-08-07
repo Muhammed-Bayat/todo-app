@@ -2,7 +2,7 @@
 
 This file is a verbatim export of user-visible messages recovered from the local Codex session log for this repository. Hidden reasoning, system/developer instructions, tool calls, and tool outputs are excluded. Commentary and final-answer labels describe the original visible message phase; they are not part of the message text.
 
-The export stops after recorded turn 70. The request that generated this export is not included because its response was still in progress when the files were generated.
+The export stops after recorded turn 75. The request that generated this export is not included because its response was still in progress when the files were generated.
 
 ## Turn 1
 
@@ -2742,4 +2742,225 @@ Assisted-by: Codex[GPT-5.6 Sol (high)]
 One caveat: the historical commits still literally lack the required trailers, as requested. The disclosure records the omission but cannot guarantee a strict marker will treat that as equivalent to trailers.
 
 Everything remains uncommitted.
+
+## Turn 71
+
+### User prompt
+
+cool make the commit and push
+
+### Assistant response
+
+#### Commentary
+
+I’ll include the complete pending work in one commit: the Windows SQLite installation fix, automatic browser launcher, updated project documentation, AI policy file, attribution disclosures, and transcript updates. Before staging, I’ll extend the transcript through the now-completed policy-compliance turn, rerun the relevant checks, then commit with the required `Assisted-by: Codex[GPT-5.6 Sol (high)]` trailer and push `main`.
+
+#### Commentary
+
+The session confirms turn 70 is complete and the commit request is turn 71. I’m updating the recorded boundary to turn 70 so the policy decision and resulting changes are included before this work is committed.
+
+#### Commentary
+
+Transcript generation now validates through turn 70. I’m running the final code checks again before staging: launcher syntax, ESLint, and all behavioral tests. The production build and both development/production launch paths already passed after the code changes.
+
+#### Commentary
+
+All checks pass: launcher syntax is valid, ESLint reports no errors, and all 8 tests pass. I’m reviewing the exact commit contents now; the known trailing spaces inside verbatim transcript quotations will remain because removing them would make those records less exact.
+
+#### Commentary
+
+The staged set contains only the requested work. I’m doing one final staged review, then I’ll create a single `fix(setup)` commit with the policy-required assistance trailer and push it.
+
+#### Commentary
+
+Commit `e056063` was created with all 17 intended files. I’m verifying the actual stored commit message contains the exact `Assisted-by` trailer before pushing it to GitHub.
+
+#### Final answer
+
+Committed and pushed successfully.
+
+- Commit: `e056063 fix(setup): improve clean installation and local launch`
+- AI trailer included: `Assisted-by: Codex[GPT-5.6 Sol (high)]`
+- Branch: `main`
+- Remote: `origin/main`
+- Working tree: clean and synchronized
+- All 8 tests and lint passed before committing.
+
+## Turn 72
+
+### User prompt
+
+see the lab_one(1).pdf go through it noting all requirements and then once youve noded go into the todo-app and repo and check and make sure all requiremnets are fullfiledd and that ill get 100% for this lab. give me a breakdown of possible changes id need to make if im not currently going to get 100 but dont make any changes
+
+### Assistant response
+
+#### Commentary
+
+I’ll audit the lab brief against the repository without changing anything. I’ll first extract every stated requirement and marking criterion from `lab_one(1).pdf`, then inspect the implementation, tests, configuration, and repository state, and finish with a requirement-by-requirement score-risk breakdown.
+
+#### Commentary
+
+The brief is a short three-page, text-based PDF, but this environment lacks its usual PDF extraction utility. I’ve confirmed the document structure and am switching to a local read-only extraction path; the repository itself is clean on `main` at this point.
+
+#### Commentary
+
+I’ve now recovered the full marking scheme: 28 marks are seven pass/fail walkthrough steps, and 72 marks cover documentation (18), commit history (18), database design (16), testing (12), and AI usage (8). I’m checking each category at the rubric’s “Complete” level, including the easy-to-miss clean-clone, throwaway-database, multi-session history, and AI-redirection evidence.
+
+#### Commentary
+
+The first definite scoring risk is in the walkthrough: the current visible workspace offers sorting by due date and topic, but not by status. A status filter exists, and an unused older sort component supports status, but the rendered page does not expose it—so walkthrough step 5 is likely a fail as submitted. I’m continuing the automated verification and checking whether any other issues compound that loss.
+
+#### Commentary
+
+The automated checks are strong: all 8 tests pass, lint passes, the local branch exactly matches `origin/main`, and the latest CI run for the current commit passed its clean checkout/install/lint/test/build workflow. My local production build only failed because this sandbox blocks the Google Fonts request; that reveals a setup fragility rather than a TypeScript/build defect, since CI passed the same commit.
+
+#### Final answer
+
+The repository is strong, but I would not expect 100% in its current state. The most likely score is **96/100** because status sorting is missing from the visible interface.
+
+No tracked files were changed; the working tree remains clean and matches `origin/main`.
+
+## Mark estimate
+
+| Section | Likely mark | Assessment |
+|---|---:|---|
+| Functional walkthrough | **24/28** | Six of seven steps appear satisfied; sorting by status likely fails |
+| Documentation | **18/18** | All required documents are detailed and substantially accurate |
+| Commit history | **18/18** | 31 commits across four dates with mostly meaningful messages |
+| Database design | **16/16** | SQLite schema, fixed statuses, timestamp archiving, derived overdue state |
+| Testing | **12/12** | 8 passing behavioural tests using disposable databases |
+| AI usage | **8/8** | Constraints, corrections, redirections and traceable decisions are documented |
+| **Estimated total** | **96/100** | Status sorting prevents a confident 100 |
+
+## Functional walkthrough
+
+1. **Install and start: likely pass — 4/4.**  
+   The README supplies clean-clone, installation, development, production and testing commands. Current `main` also has a successful [GitHub Actions run](https://github.com/Muhammed-Bayat/todo-app/actions/runs/30848849921).
+
+2. **Create a task with all four fields: pass — 4/4.**  
+   Title, description, due date and topic are accepted and persisted.
+
+3. **Edit and survive reload: pass — 4/4.**  
+   Editing updates the SQLite row rather than only changing client state.
+
+4. **Archive but remain viewable: pass — 4/4.**  
+   Archiving sets `archived_at`; it does not delete the row. Archived tasks are available through “View archived.”
+
+5. **Sort by topic, status and due date: fail — 0/4.**  
+   The rendered workspace only defines `dueDate | topic` as sortable fields and only displays those two buttons in [task-workspace.tsx](</C:/Users/bayat/Desktop/Muhammed todo/todo-app/src/app/task-workspace.tsx:23>). Status buttons filter tasks; filtering is not sorting.
+
+   There is an older status-capable component in [sort-controls.tsx](</C:/Users/bayat/Desktop/Muhammed todo/todo-app/src/app/sort-controls.tsx:20>), and the repository layer supports status sorting, but that component is not rendered anywhere.
+
+6. **Overdue indication and fixed statuses: pass — 4/4.**  
+   Overdue tasks receive a visible label and styling. The only selectable statuses are Todo, In-Progress and Complete.
+
+7. **Persistence after restart: pass — 4/4.**  
+   Tasks are stored in `database/todo.db`, which is reopened when the application restarts.
+
+## Rubric assessment
+
+- **Documentation:** The required [Third-Party Code](</C:/Users/bayat/Desktop/Muhammed todo/todo-app/documentation/third-party-code.md>), [Database Design](</C:/Users/bayat/Desktop/Muhammed todo/todo-app/documentation/database-design.md>) and [Running It](</C:/Users/bayat/Desktop/Muhammed todo/todo-app/documentation/running-it.md>) documents are present, specific and detailed.
+
+- **Commit history:** There are 31 commits spread across 30 July, 31 July, 2 August and 3 August. Most feature commits describe coherent changes. A handful of vague `fix(tests)`/`fix(ci workflow)` commits should not make the history “largely uninformative.”
+
+- **Database:** [schema.sql](</C:/Users/bayat/Desktop/Muhammed todo/todo-app/database/schema.sql>) uses sensible constraints, keeps archived tasks in the same table, restricts status values, and does not store overdue state.
+
+- **Testing:** `npm test` passed all 8 tests. Tests cover creation, editing, archiving and overdue behaviour, using temporary SQLite databases that are removed afterwards.
+
+- **AI usage:** The transcripts contain explicit constraints and corrections—for example, rejecting the originally suggested separate frontend/backend structure—and those decisions match the shipped application.
+
+## Changes needed for the safest possible 100%
+
+1. **Essential: add visible status sorting.**  
+   Add Status alongside Due date and Topic in the actual `TaskWorkspace` sort controls, with ascending/descending behaviour. Add a deterministic test proving the intended Todo → In-Progress → Complete ordering and its reverse.
+
+2. **Strongly recommended: remove the Google Fonts build dependency.**  
+   My local lint and tests passed, but `npm run build` could not fetch Geist from Google because this environment blocks external font requests. CI passed, so the code itself builds, but using bundled or system fonts would eliminate a potentially disastrous clean-clone walkthrough dependency.
+
+3. **Clean up stale documentation wording.**
+   
+   - [README.md](</C:/Users/bayat/Desktop/Muhammed todo/todo-app/README.md:64>) still calls the SQLite/browser-launch work “current uncommitted” even though it is committed.
+   - [running-it.md](</C:/Users/bayat/Desktop/Muhammed todo/todo-app/documentation/running-it.md:86>) records clean-clone verification against `f3334bc`, while current `HEAD` is `e056063`.
+   - Update the transcript commit timeline to include the final setup commit.
+
+4. **If AI helps implement those changes:** preserve the new conversation in the AI transcript records and use the policy-required `Assisted-by:` trailer on the new code commit.
+
+The only definite lost marks I found are the **4 marks for status sorting**. Everything else is currently positioned for full credit, subject to the marker’s judgment and the live walkthrough.
+
+## Turn 73
+
+### User prompt
+
+make all the changes needed besides 2 and update the raw ai transcript and the made transcrips
+
+### Assistant response
+
+#### Commentary
+
+I’ll implement the status sort, add deterministic coverage, correct the stale documentation, and extend both the raw Codex record and generated phase transcript with this audit-and-fix conversation. I’ll leave the Google Fonts setup unchanged as requested, then run transcript validation, lint, tests, and the production build if network access permits.
+
+## Turn 74
+
+### User prompt
+
+actaully leave it the tabs are close enouogh to sorting right
+
+### Assistant response
+
+#### Final answer
+
+Understood—I’ll leave everything unchanged, including the transcripts.
+
+One warning: the status tabs **filter** tasks; they do not reorder the complete list by status. A strict marker may therefore deduct the 4-mark sorting step, leaving an estimated **96/100**. The repository remains clean with no tracked changes.
+
+## Turn 75
+
+### User prompt
+
+okay fine make all the needed changes including Ai transcript and raw file additions/ editations etc dont commit it ask me before you can commit it
+
+### Assistant response
+
+#### Commentary
+
+I’ll proceed with the scoring fixes and transcript updates, without committing anything. I’m treating your earlier Google Fonts exclusion as still active: I’ll add real status sorting and tests, correct the stale documentation, and extend both the raw Codex export and generated transcript records; then I’ll show you the complete diff and ask before any commit.
+
+#### Commentary
+
+Status sorting is now implemented as a genuine ordering operation—Todo, In-Progress, Complete, with reverse order on the second click—and it has direct deterministic tests. I’m now updating the verification records and transcript generator so the new raw and curated records remain mechanically reproducible rather than being hand-edited copies.
+
+#### Commentary
+
+The transcript generator now supports both the older and current Codex session-log formats, combines them, and validates exact prompt/response inclusion. The raw export now runs through turn 74, and transcript 05 contains the corresponding audit and decision exchanges; the current in-progress implementation request is correctly excluded until this response is complete.
+
+#### Commentary
+
+All 10 tests now pass, lint passes, and the production build succeeds when allowed to fetch the unchanged Geist fonts. I’m doing the final live-page and diff audit now; no commit, staging, or push has occurred.
+
+#### Final answer
+
+All requested scoring changes are complete, with Google Fonts left unchanged per your earlier instruction.
+
+- Added visible status sorting in both directions.
+- Added deterministic status-order tests.
+- Corrected stale README and clean-clone documentation.
+- Updated transcript history and commit timeline.
+- Raw Codex transcript now contains 74 turns.
+- Generated transcript 05 now contains 53 exchanges.
+- Transcript generator supports both old and current session formats.
+- Tests: **10/10 passed**
+- ESLint: passed
+- Production build: passed
+- Live page: `200 OK`, with all three sort controls confirmed
+- Nothing is staged, committed, or pushed.
+
+Before committing, I’ll regenerate the transcripts once more to include this completed implementation turn. Proposed commit:
+
+```text
+feat(tasks): add status sorting and complete lab fixes
+
+Assisted-by: Codex[GPT-5.6 Sol (high)]
+```
+
+Would you like me to create this commit?
 
